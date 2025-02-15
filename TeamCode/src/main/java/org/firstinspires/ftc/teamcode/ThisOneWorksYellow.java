@@ -15,15 +15,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Actions.VerticalSlide;
-
 @Autonomous (name = "ThisOneWorksYellow")
 public class ThisOneWorksYellow extends LinearOpMode {
     private DcMotorEx horizontal;
-
     private Servo HSClaw;
     private Servo HSPivot;
-
     private DcMotorEx vertical;
     private Servo VSClaw;
     private Servo VSPivot;
@@ -51,27 +47,16 @@ public class ThisOneWorksYellow extends LinearOpMode {
         VSClaw = hardwareMap.get(Servo.class, "VSlideClaw");
         VSPivot = hardwareMap.get(Servo.class, "VSlidePivot");
 
-
-
         HSClaw.setPosition(0); //init close
         HSPivot.setPosition(0); //init up
 
-        VSClaw.setPosition(0); //supposed to be 0!!
-        //init up
-        VSPivot.setPosition(0.65);
+        VSClaw.setPosition(0); //init close
+        VSPivot.setPosition(0.65); //init up
 
         waitForStart();
 
         Actions.runBlocking(new SequentialAction(
-//                verticalUp(),
-//                verticalClick(),
-//                horizontalOut(),
-//                horizontalIn(),
-//                verticalBasket(),
-//                horizontalOutFar(),
-//                verticalDown(),
-//                horizontalOut(),
-//                horizontalIn()
+        //Pick Up and prep
                     new ParallelAction(
                     vsPivotDown(),
                     vsClawOpen(),
@@ -82,6 +67,8 @@ public class ThisOneWorksYellow extends LinearOpMode {
                     hsPivotDown(),
                     hsClawClose(),
                     hsPivotUp(),
+
+        //Transfer (can be done while moving)
                     horizontalIn(),
                     vsClawClose(),
                     hsClawOpen(),
@@ -92,43 +79,33 @@ public class ThisOneWorksYellow extends LinearOpMode {
     public Action verticalUp() {
         return new MoveVertical(vertical, 1225);
     }
-
     public Action verticalDown() {
         return new MoveVertical(vertical, 0);
     }
-
     public Action verticalBasket() {
         return new MoveVertical(vertical, 2760);
     }
-
     public Action verticalClick() {
         return new MoveVertical(vertical, 675);
     }
-
     public Action horizontalOut() {
         return new MoveHorizontal(horizontal, 620);
     }
-
     public Action horizontalIn() {
         return new MoveHorizontal(horizontal, 0);
     }
-
     public Action horizontalOutFar() {
         return new MoveHorizontal(horizontal, 2250); //1238
     }
-
     public Action vsPivotUp() {
         return new VSPivotAction(VSPivot, 0.65);
     }
-
     public Action vsPivotDown() {
         return new VSPivotAction(VSPivot, 1);
     }
-
     public Action hsPivotDown() {
         return new HSPivotAction(HSPivot, 0.72);
     }
-
     public Action hsPivotUp() {
         return new HSPivotAction(HSPivot, 0.01);
     }
@@ -145,145 +122,170 @@ public class ThisOneWorksYellow extends LinearOpMode {
         return new VSClawAction(VSClaw, 0);
     }
 }
+//Duplicate class problem, why don't we just call them for yellow from red?
+//class MoveVertical implements Action {
+//    private boolean initialized = false;
+//    public DcMotorEx vertical;
+//    int position;
+//
+//    public MoveVertical(DcMotorEx vertical, int position) {
+//        this.vertical = vertical;
+//        this.position = position;
+//    }
+//
+//    @Override
+//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//        if (!initialized) {
+//            vertical.setTargetPosition(position);
+//            vertical.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical.setPower(1);
+//            initialized = true;
+//        }
+//        telemetryPacket.put("state", "MoveVertical " + position);
+//        telemetryPacket.put("vertical", vertical.getCurrentPosition());
+//        return Math.abs(vertical.getTargetPosition() - vertical.getCurrentPosition()) > 20;
+//    }
+//}
+//
+//class MoveHorizontal implements Action {
+//    private boolean initialized = false;
+//    public DcMotorEx horizontal;
+//    int position;
+//
+//    ElapsedTime timer;
+//
+//    public MoveHorizontal(DcMotorEx vertical, int position) {
+//        this.horizontal = vertical;
+//        this.position = position;
+//    }
+//
+//    @Override
+//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//        if (!initialized) {
+//            horizontal.setTargetPosition(position);
+//            horizontal.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            horizontal.setPower(1);
+//            initialized = true;
+//            timer = new ElapsedTime();
+//        }
+//        telemetryPacket.put("horizontal", horizontal.getCurrentPosition());
+//        telemetryPacket.put("state", "MoveHorizontal " + position);
+//        telemetryPacket.put("timer", timer.milliseconds());
+//        boolean status = Math.abs(horizontal.getTargetPosition() - horizontal.getCurrentPosition()) >= 30;
+//        //if (timer.seconds() > 4) {
+//           // status = false;
+//        //}
+//        return status;
+//    }
+//}
+//
+//    class VSPivotAction implements Action {
+//    Servo VSPivot;
+//    double position;
+//    ElapsedTime timer;
+//    public VSPivotAction(Servo VSPivot, double position) {
+//        this.VSPivot = VSPivot;
+//        this.position = position;
+//    }
+//
+//    @Override
+//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//        if (timer == null) {
+//            timer = new ElapsedTime();
+//        }
+//
+//        VSPivot.setPosition(position);
+//
+//        return timer.seconds() < 0.60;
+//    }
+//}
+//
+//class HSPivotAction implements Action {
+//    Servo HSPivot;
+//    double position;
+//    ElapsedTime timer;
+//    public HSPivotAction(Servo HSPivot, double position) {
+//        this.HSPivot = HSPivot;
+//        this.position = position;
+//    }
+//
+//    @Override
+//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//        if (timer == null) {
+//            timer = new ElapsedTime();
+//        }
+//
+//        HSPivot.setPosition(position);
+//
+//        return timer.seconds() < 0.65;
+//    }
+//}
+//
+//class HSClawAction implements Action {
+//    Servo HSClaw;
+//    double position;
+//    ElapsedTime timer;
+//    public HSClawAction(Servo HSClaw, double position) {
+//        this.HSClaw = HSClaw;
+//        this.position = position;
+//    }
+//
+//    @Override
+//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//        if (timer == null) {
+//            timer = new ElapsedTime();
+//        }
+//
+//        HSClaw.setPosition(position);
+//
+//        return timer.seconds() < 0.60;
+//    }
+//}
+//
+//class VSClawAction implements Action {
+//    Servo VSClaw;
+//    double position;
+//    ElapsedTime timer;
+//    public VSClawAction(Servo VSClaw, double position) {
+//        this.VSClaw = VSClaw;
+//        this.position = position;
+//    }
+//
+//    @Override
+//    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//        if (timer == null) {
+//            timer = new ElapsedTime();
+//        }
+//
+//        VSClaw.setPosition(position);
+//
+//        return timer.seconds() < 0.60;
+//    }
+//}
 
-class MoveVertical implements Action {
-    private boolean initialized = false;
-    public DcMotorEx vertical;
-    int position;
-
-    public MoveVertical(DcMotorEx vertical, int position) {
-        this.vertical = vertical;
-        this.position = position;
-    }
-
-    @Override
-    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (!initialized) {
-            vertical.setTargetPosition(position);
-            vertical.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical.setPower(1);
-            initialized = true;
-        }
-        telemetryPacket.put("state", "MoveVertical " + position);
-        telemetryPacket.put("vertical", vertical.getCurrentPosition());
-        return Math.abs(vertical.getTargetPosition() - vertical.getCurrentPosition()) > 20;
-    }
-}
-
-class MoveHorizontal implements Action {
-    private boolean initialized = false;
-    public DcMotorEx horizontal;
-    int position;
-
-    ElapsedTime timer;
-
-    public MoveHorizontal(DcMotorEx vertical, int position) {
-        this.horizontal = vertical;
-        this.position = position;
-    }
-
-    @Override
-    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (!initialized) {
-            horizontal.setTargetPosition(position);
-            horizontal.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            horizontal.setPower(1);
-            initialized = true;
-            timer = new ElapsedTime();
-        }
-        telemetryPacket.put("horizontal", horizontal.getCurrentPosition());
-        telemetryPacket.put("state", "MoveHorizontal " + position);
-        telemetryPacket.put("timer", timer.milliseconds());
-        boolean status = Math.abs(horizontal.getTargetPosition() - horizontal.getCurrentPosition()) >= 30;
-        //if (timer.seconds() > 4) {
-           // status = false;
-        //}
-        return status;
-    }
-}
-
-    class VSPivotAction implements Action {
-    Servo VSPivot;
-    double position;
-    ElapsedTime timer;
-    public VSPivotAction(Servo VSPivot, double position) {
-        this.VSPivot = VSPivot;
-        this.position = position;
-    }
-
-    @Override
-    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (timer == null) {
-            timer = new ElapsedTime();
-        }
-
-        VSPivot.setPosition(position);
-
-        return timer.seconds() < 0.60;
-    }
-}
-
-class HSPivotAction implements Action {
-    Servo HSPivot;
-    double position;
-    ElapsedTime timer;
-    public HSPivotAction(Servo HSPivot, double position) {
-        this.HSPivot = HSPivot;
-        this.position = position;
-    }
-
-    @Override
-    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (timer == null) {
-            timer = new ElapsedTime();
-        }
-
-        HSPivot.setPosition(position);
-
-        return timer.seconds() < 0.65;
-    }
-}
-
-class HSClawAction implements Action {
-    Servo HSClaw;
-    double position;
-    ElapsedTime timer;
-    public HSClawAction(Servo HSClaw, double position) {
-        this.HSClaw = HSClaw;
-        this.position = position;
-    }
-
-    @Override
-    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (timer == null) {
-            timer = new ElapsedTime();
-        }
-
-        HSClaw.setPosition(position);
-
-        return timer.seconds() < 0.60;
-    }
-}
-
-class VSClawAction implements Action {
-    Servo VSClaw;
-    double position;
-    ElapsedTime timer;
-    public VSClawAction(Servo VSClaw, double position) {
-        this.VSClaw = VSClaw;
-        this.position = position;
-    }
-
-    @Override
-    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (timer == null) {
-            timer = new ElapsedTime();
-        }
-
-        VSClaw.setPosition(position);
-
-        return timer.seconds() < 0.60;
-    }
-}
+//failed attempt at making transfer into one action
+//class Common {
+//    public static Action PickUp(VSPivotAction vsPivotDown,
+//                                HSPivotAction hsPivotDown,
+//                                HSPivotAction hsPivotUp,
+//                                VSClawAction vsClawOpen,
+//                                HSClawAction hsClawOpen,
+//                                HSClawAction hsClawClose,
+//                                MoveHorizontal horizontalOutFar) {
+//        return new SequentialAction (
+//                new ParallelAction(
+//                        vsPivotDown(),
+//                        vsClawOpen(),
+//                        hsClawOpen(),
+//                        horizontalOutFar()
+//                ),
+//
+//                hsPivotDown(),
+//                hsClawClose(),
+//                hsPivotUp(),
+//
+//        );
+//    }
+//}
 
 

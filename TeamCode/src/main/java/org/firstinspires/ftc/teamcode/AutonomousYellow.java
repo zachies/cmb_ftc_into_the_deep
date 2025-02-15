@@ -168,14 +168,14 @@ public class AutonomousYellow extends LinearOpMode {
                         //verticalSlide.vsClawOpen(),
                         BackUp2.build(),
                         //verticalSlide.verticalDown(),
-                        //verticalSlide.vsPivotDown(),
+                        verticalSlide.vsPivotDown(),
 
                         new ParallelAction (
-                                SquareUp.build()
+                                SquareUp.build(),
                                 //for init not to backfire
-//                                horizontalSlide.hsClawOpen(),
-//                                verticalSlide.vsPivotDown(),
-//                                verticalSlide.vsClawOpen()
+                                horizontalSlide.hsClawOpen(),
+                                verticalSlide.vsPivotDown(),
+                                verticalSlide.vsClawOpen()
                         )
 
                 )
